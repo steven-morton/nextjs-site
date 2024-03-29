@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import { ColDef } from 'ag-grid-community';
+import { ColDef, ICellRendererParams } from 'ag-grid-community';
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
@@ -13,27 +13,67 @@ type RowData = {
     electric: boolean;
 };
 
-export default function Grid(){
-    const [rowData, setRowData] = useState<RowData[]>([
-        { make: "Tesla", model: "Model Y", price: 64950, electric: true },
-        { make: "Ford", model: "F-Series", price: 33850, electric: false },
-        { make: "Toyota", model: "Corolla", price: 29600, electric: false },
-    ]);
+const columnDefs: ColDef<RowData>[] = [
+    { field: "make", headerName: "Manufacturer" },
+    { field: "model", headerName: "Model" },
+    { 
+        field: "price",
+        headerName: "Price ($)",
+        valueFormatter: ({value}) => value.toLocaleString("en-US", {style:"currency", currency:"USD"}) },
+    { 
+        field: "electric",
+        headerName: "Electric",
+        cellRenderer: (params:ICellRendererParams) => params.value ? 'Yes' : 'No'
+    }
+]
+
+const getData = (): RowData[] => [
+    { make: "Tesla", model: "Model Y", price: 64950, electric: true },
+    { make: "Ford", model: "F-Series", price: 33850, electric: false },
+    { make: "Toyota", model: "Corolla", price: 29600, electric: false },
+]
+
+const Grid = () => {
+    const [rowData, setRowData] = useState<RowData[]>();
+    const gridRef = useRef<AgGridReact>(null);
+
+    const deleteSelectedRows = useCallback(() => {
+        const selectedNodes = gridRef.current?.api.getSelectedNodes();
+        const selectedData = selectedNodes?.map(node => node.data);
+        setRowData(prevRows => prevRows?.filter(row => !selectedData?.includes(row)));
+    }, []);
+
+    const loadData = useCallback(() => {
+        const data = getData();
+        setRowData(data);
+    }, []);
+
+    useEffect(loadData, [loadData]);
     
-
-    const [colDefs, setColDefs] = useState<ColDef<RowData>[]>([
-        { field: "make" },
-        { field: "model" },
-        { field: "price" },
-        { field: "electric" }
-    ]);
-
     return (
-        <div className="ag-theme-quartz" style={{ height: 500 }}>
+        <div className="ag-theme-quartz" style={{ height: 1000 }}>
+            <button
+                onClick={deleteSelectedRows}
+                className="bg-red-600 text-white py-2 px-4"
+            >
+                Delete selected rows
+            </button>
+            <button 
+                onClick={loadData}
+                className="bg-slate-600 text-white py-2 px-4"
+            > 
+                Reset data
+            </button>
             <AgGridReact
+                ref={gridRef}
                 rowData={rowData}
-                columnDefs={colDefs}
+                columnDefs={columnDefs}
+                rowSelection="multiple"
+                animateRows={true}
+                suppressCellFocus={true}
             />
         </div>
     )
 }
+
+export default Grid;
