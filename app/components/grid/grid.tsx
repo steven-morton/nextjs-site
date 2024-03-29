@@ -11,13 +11,13 @@ import { GetData } from './dataService';
 
 const Grid = () => {
     const [rowData, setRowData] = useState<RowData[]>([]);
-    const gridRef = useRef<AgGridReact>(null);
+    const gridRef = useRef<AgGridReact<RowData>>(null);
 
     const deleteSelectedRows = useCallback(() => {
-        const selectedRows : RowData[] | undefined = gridRef.current?.api.getSelectedRows();
+        const selectedRows = gridRef.current?.api.getSelectedRows();
         if(selectedRows){
             const selectedIds = new Set(selectedRows.map(row => row.id));
-            setRowData(rowData => rowData?.filter(row => !selectedIds.has(row.id)));
+            setRowData(rowData => rowData.filter(row => !selectedIds.has(row.id)));
         }
     }, []);
 
