@@ -13,5 +13,5 @@ export const ColumnDefinitions: ColDef<RowData>[] = [
         field: "electric",
         headerName: "Electric",
         cellRenderer: (params: ICellRendererParams) => params.value ? 'Yes' : 'No'
-    }
+    },
 ];

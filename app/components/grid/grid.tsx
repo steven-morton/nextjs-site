@@ -21,6 +21,10 @@ const Grid = () => {
         }
     }, []);
 
+    const resetSorting = useCallback(() => {
+        gridRef.current?.api.resetColumnState();
+    }, []);
+
     const loadData = useCallback(() => {
         setRowData(GetData());
     }, []);
@@ -28,27 +32,37 @@ const Grid = () => {
     useEffect(loadData, [loadData]);
     
     return (
-        <div className="ag-theme-quartz" style={{ height: 1000 }}>
-            <button
-                onClick={deleteSelectedRows}
-                className="bg-red-600 text-white py-2 px-4"
-            >
-                Delete selected rows
-            </button>
-            <button 
-                onClick={loadData}
-                className="bg-slate-600 text-white py-2 px-4"
-            > 
-                Reset data
-            </button>
-            <AgGridReact
-                ref={gridRef}
-                rowData={rowData}
-                columnDefs={ColumnDefinitions}
-                rowSelection="multiple"
-                animateRows={true}
-                suppressCellFocus={true}
-            />
+        <div className='flex' style={{ height: '100vh' }}>
+            <div className="flex-grow ag-theme-quartz">
+                <AgGridReact
+                    ref={gridRef}
+                    rowData={rowData}
+                    columnDefs={ColumnDefinitions}
+                    rowSelection="multiple"
+                    animateRows={true}
+                    suppressCellFocus={true}
+                />
+            </div>
+            <div className="flex flex-col justify-start">
+                <button
+                    onClick={deleteSelectedRows}
+                    className="bg-red-600 text-white py-2 px-4"
+                >
+                    Delete selected rows
+                </button>
+                <button 
+                    onClick={resetSorting}
+                    className="bg-slate-600 text-white py-2 px-4"
+                > 
+                    Reset sorting
+                </button>
+                <button 
+                    onClick={loadData}
+                    className="bg-green-600 text-white py-2 px-4"
+                > 
+                    Reset data
+                </button>
+            </div>
         </div>
     )
 }
