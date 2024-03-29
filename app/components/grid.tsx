@@ -7,6 +7,7 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
 type RowData = {
+    id: number;
     make: string;
     model: string;
     price: number;
@@ -28,24 +29,25 @@ const columnDefs: ColDef<RowData>[] = [
 ]
 
 const getData = (): RowData[] => [
-    { make: "Tesla", model: "Model Y", price: 64950, electric: true },
-    { make: "Ford", model: "F-Series", price: 33850, electric: false },
-    { make: "Toyota", model: "Corolla", price: 29600, electric: false },
+    { id: 1, make: "Tesla", model: "Model Y", price: 64950, electric: true },
+    { id: 2, make: "Ford", model: "F-Series", price: 33850, electric: false },
+    { id: 3, make: "Toyota", model: "Corolla", price: 29600, electric: false },
 ]
 
 const Grid = () => {
-    const [rowData, setRowData] = useState<RowData[]>();
+    const [rowData, setRowData] = useState<RowData[]>([]);
     const gridRef = useRef<AgGridReact>(null);
 
     const deleteSelectedRows = useCallback(() => {
-        const selectedNodes = gridRef.current?.api.getSelectedNodes();
-        const selectedData = selectedNodes?.map(node => node.data);
-        setRowData(prevRows => prevRows?.filter(row => !selectedData?.includes(row)));
+        const selectedRows : RowData[] | undefined = gridRef.current?.api.getSelectedRows();
+        if(selectedRows){
+            const selectedIds = new Set(selectedRows.map(row => row.id));
+            setRowData(rowData => rowData?.filter(row => !selectedIds.has(row.id)));
+        }
     }, []);
 
     const loadData = useCallback(() => {
-        const data = getData();
-        setRowData(data);
+        setRowData(getData());
     }, []);
 
     useEffect(loadData, [loadData]);
