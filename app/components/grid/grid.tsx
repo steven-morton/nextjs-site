@@ -4,10 +4,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
+import styled from 'styled-components';
 
 import { RowData } from './types/rowData';
 import { ColumnDefinitions } from './columnDefinitions'
 import { GetData } from './dataService';
+
+const GridWrapper = styled.div`
+    display: flex;
+    height: 100vh;
+`;
 
 const Grid = () => {
     const [rowData, setRowData] = useState<RowData[]>([]);
@@ -32,7 +38,7 @@ const Grid = () => {
     useEffect(loadData, [loadData]);
     
     return (
-        <div className='flex' style={{ height: '100vh' }}>
+        <GridWrapper>
             <div className="flex-grow ag-theme-quartz">
                 <AgGridReact
                     ref={gridRef}
@@ -63,7 +69,7 @@ const Grid = () => {
                     Reset data
                 </button>
             </div>
-        </div>
+        </GridWrapper>
     )
 }
 
